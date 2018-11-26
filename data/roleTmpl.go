@@ -11,4 +11,5 @@ objectClass: top
 objectClass: organizationalUnit
 objectClass: gmccUnit
 description: {{.Name}}
+
 {{end}}`
