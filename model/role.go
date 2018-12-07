@@ -7,5 +7,4 @@ type Role struct {
 	Name     string `gorm:"column:role_name;type:varchar(50)"` //角色名称
 	Memo     string `gorm:"column:memo;type:varchar(500)"`     //注释
 	Ord      int    `gorm:"column:ord;type:int4(32)"`          //排序
-
 }

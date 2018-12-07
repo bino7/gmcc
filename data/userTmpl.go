@@ -5,21 +5,22 @@ const userTempl = `
 {{ range $i, $v := .users }}
 #{{$i}}
 dn: {{GetDn $v $baseDn}}
-cn: {{$v.LoginId}}
-idcard: {{$v.IdCard}}
-mail: {{$v.Email}}
-mobile: {{$v.Mobile}}
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
 objectclass: inetOrgPerson
 objectclass: gmccUser
+cn: {{$v.LoginId}}
+idcard: {{if eq $v.IdCard ""}}n/a{{else}}{{$v.IdCard}}{{end}}
+mail: {{if eq $v.Email ""}}n/a{{else}}{{$v.Email}}{{end}}
+mobile: {{if eq $v.Mobile ""}}n/a{{else}}{{$v.Mobile}}{{end}} 
 outtime: {{GetOutTime $v}}
 pwdstate: {{$v.PwdState}}
 sex: {{$v.Sex}}
 sn: {{$v.Name}}
 state: {{$v.State}}
 uid: {{$v.ID}}
-userpassword: {md5}CY9rzUYh03PK3k6DJie09g==
+userpassword: {md5}{{$v.Password}}
+orgId: {{$v.OrgId}}
 
 {{end}}`

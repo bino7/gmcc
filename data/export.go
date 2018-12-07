@@ -31,7 +31,10 @@ var userT *template.Template
 func initUserTmpl() (err error) {
 	var funcMap = template.FuncMap{
 		"GetOutTime": func(u User) string {
-			return "20181130145227+0800"
+			if u.OutTime.IsZero() {
+				return "20060102150405+0800"
+			}
+			return u.OutTime.Format("20060102150405+0800")
 		},
 		"GetDn": func(u User, baseDn string) string {
 			return fmt.Sprintf("cn=%s,%s", u.LoginId, baseDn)

@@ -38,11 +38,39 @@ func TestIsEntryExisted(t *testing.T) {
 		t.Fail()
 	}
 	defer conn.Close()
-	ok, err := isEntryExisted("cn=test,ou=people,dc=10086,dc=cn", conn)
+	ok, err := isEntryExistedByFilter("(outTime!=20181130145227+0800)", "ou=people,dc=10086,dc=cn", conn)
 	fmt.Println(ok, err)
 	if !ok {
 		t.Fail()
 	}
+}
+
+func TestFilter(t *testing.T) {
+	conn, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", "bino", 389))
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	username := "cn=admin,dc=10086,dc=cn"
+	password := "wtf5560#@*"
+	err = conn.Bind(username, password)
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	defer conn.Close()
+
+	rs, err := conn.Search(ldap.NewSearchRequest("ou=People,dc=10086,dc=cn", ldap.ScopeWholeSubtree, 0, 0, 0,
+		false, "((outTime<=CurrentTimestamp))", []string{"cn,outTime,CurrentTimestamp"}, nil))
+	if err != nil {
+		fmt.Println(err)
+		t.Fail()
+	}
+	fmt.Println(len(rs.Entries))
+	rs.PrettyPrint(2)
+	rs.Print()
+
 }
 
 func TestDN(t *testing.T) {
