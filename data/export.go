@@ -2,6 +2,8 @@ package data
 
 import (
 	"bufio"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	. "github.com/bino7/gmcc/model"
 	"github.com/jinzhu/gorm"
@@ -9,6 +11,14 @@ import (
 	"os"
 	"text/template"
 )
+
+func hexToBase64(hexstr string) (string, error) {
+	hexbyte, err := hex.DecodeString(hexstr)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(hexbyte), nil
+}
 
 func initTmpl() error {
 	if err := initUserTmpl(); err != nil {
@@ -38,6 +48,14 @@ func initUserTmpl() (err error) {
 		},
 		"GetDn": func(u User, baseDn string) string {
 			return fmt.Sprintf("cn=%s,%s", u.LoginId, baseDn)
+		},
+		"GetPassword": func(hexstring string) string {
+			base64str, err := hexToBase64(hexstring)
+			if err != nil {
+				err = fmt.Errorf("password %s can't be converted to base64str", hexstring)
+				panic(err)
+			}
+			return base64str
 		},
 	}
 	userT, err = template.New("user").Funcs(funcMap).Parse(userTempl)
@@ -70,6 +88,9 @@ func initAuthorityTmpl() (err error) {
 	authorityT, err = template.New("authority").Parse(authorityTmpl)
 	return
 }
+
+//select user_id,user_name,login_id,password,sex,email,mobile,state,pwd_state,memo,reg_date,update_date,creater_id,
+// org_id,id_card,out_time from pure_user
 func exportUsers(baseDn, sql, outputFile, dbHost string, dbPort int, dbName, dbUser, dbPassword, sslmode string) error {
 	db, err := openDB(sslmode, dbHost, dbPort, dbUser, dbName, dbPassword)
 	if err != nil {
@@ -104,6 +125,8 @@ func exportUsers(baseDn, sql, outputFile, dbHost string, dbPort int, dbName, dbU
 	return nil
 }
 
+//select * from pure_role where role_id='root'
+//select * from pure_role where parent_id=?
 func exportRoles(baseDn, sql, rSql, outputFile, dbHost string, dbPort int, dbName, dbUser, dbPassword, sslmode string) error {
 	db, err := openDB(sslmode, dbHost, dbPort, dbUser, dbName, dbPassword)
 	if err != nil {
@@ -159,6 +182,9 @@ func exportRole(baseDn string, roles []Role, rSql string, w io.Writer, db *gorm.
 	return nil
 }
 
+//select * from pure_org where org_id='020';
+//select * from pure_org where parent_id=?
+//select login_id,role_code,role_name,group_code from pure_usergroupandrole where group_code=?
 func exportOrgs(baseDn, sql, rSql, authoritySql, outputFile, dbHost string, dbPort int, dbName, dbUser, dbPassword, sslmode string) error {
 	db, err := openDB(sslmode, dbHost, dbPort, dbUser, dbName, dbPassword)
 	if err != nil {

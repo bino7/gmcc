@@ -1,11 +1,25 @@
 package data
 
 import (
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"regexp"
 	"testing"
 )
 
+func TestHexToString(t *testing.T) {
+
+	const s = "721d024212f42f88e1dd98d7782fe66f"
+	decoded, err := hex.DecodeString(s)
+	if err != nil {
+		fmt.Println(err)
+	}
+	encoded := base64.StdEncoding.EncodeToString(decoded)
+
+	fmt.Printf("%s\n", encoded)
+
+}
 func TestExport(t *testing.T) {
 	//20181130145227+0800
 	reg, err := regexp.Compile("^[a-fA-F0-9]{32}$")

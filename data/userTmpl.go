@@ -20,7 +20,7 @@ sex: {{$v.Sex}}
 sn: {{$v.Name}}
 state: {{$v.State}}
 uid: {{$v.ID}}
-userpassword: {md5}{{$v.Password}}
+userpassword: {md5}{{GetPassword $v.Password}}
 orgId: {{$v.OrgId}}
 
 {{end}}`
